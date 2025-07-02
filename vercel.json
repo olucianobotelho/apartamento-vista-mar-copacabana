@@ -1,17 +1,8 @@
 {
-  "version": 2,
-  "name": "apartamento-vista-mar-copacabana",
-  "builds": [
+  "rewrites": [
     {
-      "src": "index.html",
-      "use": "@vercel/static"
+      "source": "/(.*)",
+      "destination": "/index.html"
     }
-  ],
-  "routes": [
-    {
-      "src": "/(.*)",
-      "dest": "/index.html"
-    }
-  ],
-  "trailingSlash": false
+  ]
 }
