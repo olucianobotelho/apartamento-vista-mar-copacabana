@@ -1,0 +1,833 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Apartamento| Copacabana</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html, body {
+            height: 100%;
+            overflow-x: hidden;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: transparent;
+        }
+
+        .app {
+            width: 100vw;
+            height: 100vh;
+            background: white;
+            position: relative;
+            overflow-y: auto;
+            overflow-x: hidden;
+        }
+
+        /* Header removed */
+
+        /* Card */
+        .card {
+            position: relative;
+            background: white;
+            min-height: calc(100vh - 80px);
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Image Section */
+        .image-section {
+            height: 60vh;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .image-container {
+            width: 100%;
+            height: 100%;
+            position: relative;
+        }
+
+        .property-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: none;
+        }
+
+        .property-image.active {
+            display: block;
+        }
+
+        /* Image Indicators */
+        .indicators {
+            position: absolute;
+            top: 1rem;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 0.3rem;
+            z-index: 10;
+        }
+
+        .indicator {
+            width: 30px;
+            height: 4px;
+            background: rgba(255,255,255,0.4);
+            border-radius: 2px;
+            transition: background 0.3s ease;
+        }
+
+        .indicator.active {
+            background: white;
+        }
+
+        /* Info Overlay */
+        .info-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(transparent, rgba(0,0,0,0.6), rgba(0,0,0,0.95));
+            color: white;
+            padding: 3rem;
+            z-index: 2;
+        }
+
+        /* Detailed Content Section */
+        .detailed-content {
+            background: white;
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        /* Section Styles */
+        .section {
+            margin-bottom: 30px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 15px;
+            border-left: 4px solid #ff6b6b;
+        }
+
+        .section-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .section-content {
+            color: #555;
+            line-height: 1.6;
+            font-size: 15px;
+        }
+
+        .section-content p {
+            margin-bottom: 12px;
+        }
+
+        /* Features Grid */
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .feature-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            transition: transform 0.2s ease;
+        }
+
+        .feature-item:hover {
+            transform: translateY(-2px);
+        }
+
+        .feature-icon {
+            font-size: 20px;
+        }
+
+        .feature-text {
+            font-size: 13px;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        /* Amenities List */
+        .amenities-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 12px;
+            margin-top: 15px;
+        }
+
+        .amenity-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 15px;
+            background: white;
+            border-radius: 8px;
+            font-size: 14px;
+            color: #2c3e50;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+        }
+
+        .amenity-icon {
+            font-size: 18px;
+        }
+
+        /* Location Points */
+        .location-points {
+            margin-top: 20px;
+        }
+
+        .location-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 15px;
+            background: white;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .location-icon {
+            font-size: 24px;
+            width: 40px;
+            text-align: center;
+        }
+
+        .location-details {
+            flex: 1;
+        }
+
+        .location-name {
+            font-weight: 600;
+            color: #2c3e50;
+            font-size: 15px;
+        }
+
+        .location-distance {
+            color: #ff6b6b;
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        /* Action Button Container */
+        .action-button-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: fixed;
+            bottom: 80px;
+            left: 0;
+            right: 0;
+            z-index: 10;
+            opacity: 0;
+            transform: translateY(100px);
+            transition: all 0.3s ease;
+        }
+        
+        .action-button-container.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        /* Footer */
+        .footer {
+            background: linear-gradient(135deg, #1a1a1a, #2d2d2d);
+            color: white;
+            text-align: center;
+            padding: 20px;
+            margin-top: 40px;
+            font-size: 0.9rem;
+        }
+        
+        .footer p {
+            margin: 0;
+            opacity: 0.8;
+        }
+
+        .action-button {
+            background: linear-gradient(135deg, #25d366, #128c7e);
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(37, 211, 102, 0.3);
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .action-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(37, 211, 102, 0.4);
+        }
+
+        .action-button:active {
+            transform: translateY(0);
+        }
+
+        .profile-header {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .profile-name {
+            font-size: 1.8rem;
+            font-weight: 700;
+        }
+
+        .profile-age {
+            font-size: 1.8rem;
+            font-weight: 400;
+            opacity: 0.9;
+        }
+
+        .verification-badge {
+            background: #1DA1F2;
+            color: white;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+
+        .profile-info {
+            margin-bottom: 1rem;
+        }
+
+        .job-title {
+            font-size: 1rem;
+            opacity: 0.9;
+            margin-bottom: 0.3rem;
+        }
+
+        .location {
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+
+        .stats {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .stat {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 1.2rem;
+            font-weight: 600;
+            display: block;
+        }
+
+        .stat-label {
+            font-size: 0.8rem;
+            opacity: 0.8;
+        }
+
+        .bio {
+            font-size: 0.9rem;
+            line-height: 1.4;
+            opacity: 0.9;
+        }
+
+        /* Action Button */
+        .action-button {
+            position: sticky;
+            bottom: 2rem;
+            left: 1rem;
+            right: 1rem;
+            margin: 2rem 1rem;
+            background: linear-gradient(45deg, #25D366, #128C7E);
+            color: white;
+            border: none;
+            padding: 1.2rem;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(37, 211, 102, 0.3);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .action-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(37, 211, 102, 0.4);
+        }
+
+        .action-button:active {
+            transform: translateY(0);
+        }
+
+        /* Touch Navigation */
+        .touch-area {
+            position: absolute;
+            top: 0;
+            width: 50%;
+            height: 100%;
+            z-index: 3;
+            cursor: pointer;
+        }
+
+        .touch-left {
+            left: 0;
+        }
+
+        .touch-right {
+            right: 0;
+        }
+
+        /* Responsive */
+        @media (min-width: 768px) {
+            .app {
+                max-width: 400px;
+                margin: 0 auto;
+                border-radius: 20px;
+                overflow: hidden;
+                box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+            }
+
+            .card {
+                border-radius: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app">
+
+
+        <!-- Card -->
+        <div class="card">
+            <!-- Image Section -->
+            <div class="image-section">
+                <div class="image-container">
+                    <!-- Images -->
+                    <img src="https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80" alt="Vista da sala" class="property-image active">
+                    <img src="https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80" alt="Quarto master" class="property-image">
+                    <img src="https://images.unsplash.com/photo-1560185127-6ed189bf02f4?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80" alt="Cozinha" class="property-image">
+                    <img src="https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80" alt="Área de lazer" class="property-image">
+
+                    <!-- Indicators -->
+                    <div class="indicators">
+                        <div class="indicator active"></div>
+                        <div class="indicator"></div>
+                        <div class="indicator"></div>
+                        <div class="indicator"></div>
+                    </div>
+
+                    <!-- Touch Areas -->
+                    <div class="touch-area touch-left"></div>
+                    <div class="touch-area touch-right"></div>
+                </div>
+
+                <!-- Info Overlay -->
+                <div class="info-overlay">
+                    <div class="profile-header">
+                        <span class="profile-name">Apartamento</span>
+                        <span class="profile-age"></span>
+                        <div class="verification-badge">✓</div>
+                    </div>
+
+                    <div class="profile-info">
+                        <div class="job-title">🏠 Apartamento de Luxo</div>
+                        <div class="location">📍Copacabana, Rio de Janeiro</div>
+                    </div>
+
+                    <div class="stats">
+                        <div class="stat">
+                            <span class="stat-value">120</span>
+                            <span class="stat-label">m²</span>
+                        </div>
+                        <div class="stat">
+                            <span class="stat-value">3</span>
+                            <span class="stat-label">suítes</span>
+                        </div>
+                        <div class="stat">
+                            <span class="stat-value">2</span>
+                            <span class="stat-label">vagas</span>
+                        </div>
+                        <div class="stat">
+                            <span class="stat-value">15°</span>
+                            <span class="stat-label">andar</span>
+                        </div>
+                    </div>
+
+                    
+                </div>
+             </div>
+
+             <!-- Detailed Content Section -->
+             <div class="detailed-content">
+                 <!-- About Section -->
+                 <div class="section">
+                     <h3 class="section-title">
+                         🏠 Sobre o Apartamento
+                     </h3>
+                     <div class="section-content">
+                         <p>Este magnífico apartamento de 120m² oferece uma experiência única de morar em Copacabana. Com acabamentos de primeira linha e uma vista deslumbrante para o mar, cada ambiente foi pensado para proporcionar máximo conforto e sofisticação.</p>
+                         <p>O imóvel conta com 3 suítes espaçosas, todas com closet e banheiros com acabamento em mármore. A sala de estar integrada à varanda gourmet cria um ambiente perfeito para relaxar e receber amigos, sempre com a vista do mar como pano de fundo.</p>
+                     </div>
+                 </div>
+
+                 <!-- Features Section -->
+                 <div class="section">
+                     <h3 class="section-title">
+                         ✨ Características Especiais
+                     </h3>
+                     <div class="features-grid">
+                         <div class="feature-item">
+                             <span class="feature-icon">🌊</span>
+                             <div class="feature-text">Vista Mar Panorâmica</div>
+                         </div>
+                         <div class="feature-item">
+                             <span class="feature-icon">🛋️</span>
+                             <div class="feature-text">Totalmente Mobiliado</div>
+                         </div>
+                         <div class="feature-item">
+                             <span class="feature-icon">❄️</span>
+                             <div class="feature-text">Ar Condicionado</div>
+                         </div>
+                         <div class="feature-item">
+                             <span class="feature-icon">🚗</span>
+                             <div class="feature-text">2 Vagas Cobertas</div>
+                         </div>
+                         <div class="feature-item">
+                             <span class="feature-icon">🏢</span>
+                             <div class="feature-text">15º Andar</div>
+                         </div>
+                         <div class="feature-item">
+                             <span class="feature-icon">🔒</span>
+                             <div class="feature-text">Segurança 24h</div>
+                         </div>
+                     </div>
+                 </div>
+
+                 <!-- Amenities Section -->
+                 <div class="section">
+                     <h3 class="section-title">
+                         🏊‍♀️ Comodidades do Prédio
+                     </h3>
+                     <div class="amenities-list">
+                         <div class="amenity-item">
+                             <span class="amenity-icon">🏊‍♀️</span>
+                             <span>Piscina com vista mar</span>
+                         </div>
+                         <div class="amenity-item">
+                             <span class="amenity-icon">💪</span>
+                             <span>Academia completa</span>
+                         </div>
+                         <div class="amenity-item">
+                             <span class="amenity-icon">🎉</span>
+                             <span>Salão de festas</span>
+                         </div>
+                         <div class="amenity-item">
+                             <span class="amenity-icon">🧖‍♀️</span>
+                             <span>Spa e sauna</span>
+                         </div>
+                         <div class="amenity-item">
+                             <span class="amenity-icon">🎮</span>
+                             <span>Espaço gourmet</span>
+                         </div>
+                         <div class="amenity-item">
+                             <span class="amenity-icon">🚗</span>
+                             <span>Serviço de valet</span>
+                         </div>
+                         <div class="amenity-item">
+                             <span class="amenity-icon">🔒</span>
+                             <span>Portaria 24 horas</span>
+                         </div>
+                         <div class="amenity-item">
+                             <span class="amenity-icon">📶</span>
+                             <span>Wi-Fi nas áreas comuns</span>
+                         </div>
+                     </div>
+                 </div>
+
+                 <!-- Location Section -->
+                 <div class="section">
+                     <h3 class="section-title">
+                         📍 Localização Privilegiada
+                     </h3>
+                     <div class="section-content">
+                         <p>Localizado no coração de Copacabana, você estará a poucos passos dos principais pontos turísticos e comerciais do Rio de Janeiro. A localização oferece fácil acesso a transporte público, restaurantes, shopping centers e, claro, a famosa praia de Copacabana.</p>
+                     </div>
+                     <div class="location-points">
+                         <div class="location-item">
+                             <span class="location-icon">🏖️</span>
+                             <div class="location-details">
+                                 <div class="location-name">Praia de Copacabana</div>
+                                 <div class="location-distance">2 minutos a pé</div>
+                             </div>
+                         </div>
+                         <div class="location-item">
+                             <span class="location-icon">🚇</span>
+                             <div class="location-details">
+                                 <div class="location-name">Estação Metrô Copacabana</div>
+                                 <div class="location-distance">5 minutos a pé</div>
+                             </div>
+                         </div>
+                         <div class="location-item">
+                             <span class="location-icon">🛒</span>
+                             <div class="location-details">
+                                 <div class="location-name">Shopping Copacabana</div>
+                                 <div class="location-distance">8 minutos a pé</div>
+                             </div>
+                         </div>
+                         <div class="location-item">
+                             <span class="location-icon">🍽️</span>
+                             <div class="location-details">
+                                 <div class="location-name">Restaurantes e Bares</div>
+                                 <div class="location-distance">Na porta</div>
+                             </div>
+                         </div>
+                     </div>
+                 </div>
+
+                 <!-- Action Button -->
+                 <div class="action-button-container">
+                     <button class="action-button" onclick="openWhatsApp()">
+                         📱 Me chame no WhatsApp
+                     </button>
+                 </div>
+                 
+                 <!-- Footer -->
+                 <div class="footer">
+                     <p>© 2025 Imóveis Premium - Todos os direitos reservados</p>
+                 </div>
+             </div>
+         </div>
+     </div>
+
+    <script>
+        let currentImageIndex = 0;
+        const images = document.querySelectorAll('.property-image');
+        const indicators = document.querySelectorAll('.indicator');
+        const imageContainer = document.querySelector('.image-container');
+        
+        // Touch/Drag variables
+        let startX = 0;
+        let startY = 0;
+        let isDragging = false;
+        let hasMoved = false;
+        
+        function showImage(index) {
+            images.forEach((img, i) => {
+                img.classList.toggle('active', i === index);
+            });
+            
+            indicators.forEach((indicator, i) => {
+                indicator.classList.toggle('active', i === index);
+            });
+        }
+        
+        function nextImage() {
+            currentImageIndex = (currentImageIndex + 1) % images.length;
+            showImage(currentImageIndex);
+        }
+        
+        function prevImage() {
+            currentImageIndex = (currentImageIndex - 1 + images.length) % images.length;
+            showImage(currentImageIndex);
+        }
+        
+        // Touch Events for mobile
+        imageContainer.addEventListener('touchstart', (e) => {
+            startX = e.touches[0].clientX;
+            startY = e.touches[0].clientY;
+            isDragging = true;
+            hasMoved = false;
+        });
+        
+        imageContainer.addEventListener('touchmove', (e) => {
+            if (!isDragging) return;
+            
+            const currentX = e.touches[0].clientX;
+            const currentY = e.touches[0].clientY;
+            const diffX = Math.abs(currentX - startX);
+            const diffY = Math.abs(currentY - startY);
+            
+            // If horizontal movement is greater than vertical, prevent scrolling
+            if (diffX > diffY && diffX > 10) {
+                e.preventDefault();
+                hasMoved = true;
+            }
+        });
+        
+        imageContainer.addEventListener('touchend', (e) => {
+            if (!isDragging || !hasMoved) {
+                isDragging = false;
+                return;
+            }
+            
+            const endX = e.changedTouches[0].clientX;
+            const diffX = startX - endX;
+            const threshold = 50; // Minimum distance for swipe
+            
+            if (Math.abs(diffX) > threshold) {
+                if (diffX > 0) {
+                    nextImage(); // Swipe left - next image
+                } else {
+                    prevImage(); // Swipe right - previous image
+                }
+            }
+            
+            isDragging = false;
+            hasMoved = false;
+        });
+        
+        // Mouse Events for desktop
+        imageContainer.addEventListener('mousedown', (e) => {
+            startX = e.clientX;
+            startY = e.clientY;
+            isDragging = true;
+            hasMoved = false;
+            e.preventDefault();
+        });
+        
+        imageContainer.addEventListener('mousemove', (e) => {
+            if (!isDragging) return;
+            
+            const currentX = e.clientX;
+            const diffX = Math.abs(currentX - startX);
+            
+            if (diffX > 10) {
+                hasMoved = true;
+            }
+        });
+        
+        imageContainer.addEventListener('mouseup', (e) => {
+            if (!isDragging) return;
+            
+            if (hasMoved) {
+                const endX = e.clientX;
+                const diffX = startX - endX;
+                const threshold = 50;
+                
+                if (Math.abs(diffX) > threshold) {
+                    if (diffX > 0) {
+                        nextImage();
+                    } else {
+                        prevImage();
+                    }
+                }
+            } else {
+                // Simple click navigation
+                const rect = imageContainer.getBoundingClientRect();
+                const clickX = e.clientX - rect.left;
+                const centerX = rect.width / 2;
+                
+                if (clickX > centerX) {
+                    nextImage();
+                } else {
+                    prevImage();
+                }
+            }
+            
+            isDragging = false;
+            hasMoved = false;
+        });
+        
+        // Prevent context menu on long press
+        imageContainer.addEventListener('contextmenu', (e) => {
+            e.preventDefault();
+        });
+        
+        // Touch navigation (fallback for touch areas)
+        document.querySelector('.touch-left').addEventListener('click', prevImage);
+        document.querySelector('.touch-right').addEventListener('click', nextImage);
+        
+        // Auto slide every 5 seconds (increased from 4)
+        let autoSlideInterval = setInterval(nextImage, 5000);
+        
+        // Pause auto slide when user interacts
+        function resetAutoSlide() {
+            clearInterval(autoSlideInterval);
+            autoSlideInterval = setInterval(nextImage, 5000);
+        }
+        
+        imageContainer.addEventListener('touchstart', resetAutoSlide);
+        imageContainer.addEventListener('mousedown', resetAutoSlide);
+        
+        function openWhatsApp() {
+            const message = encodeURIComponent(
+                '🏠 Olá! Tenho interesse no Apartamento Vista Mar em Copacabana.\n\n' +
+                '📍 Localização: Copacabana, Rio de Janeiro\n' +
+                '🏢 120m², 3 suítes, 2 vagas, 15º andar\n' +
+                '🌊 Vista para o mar\n\n' +
+                'Gostaria de mais informações e agendar uma visita!'
+            );
+            const phone = '5521999999999'; // Substitua pelo número real
+            window.open(`https://wa.me/${phone}?text=${message}`, '_blank');
+        }
+        
+
+        
+        // Show WhatsApp button when scrolling and images occupy 70% of screen
+        const actionButtonContainer = document.querySelector('.action-button-container');
+        const imageSection = document.querySelector('.image-section');
+        
+        function checkScrollPosition() {
+            const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+            const windowHeight = window.innerHeight;
+            const imageSectionRect = imageSection.getBoundingClientRect();
+            
+            // Calculate if images occupy 70% or less of the viewport
+            const imageVisibleHeight = Math.max(0, Math.min(imageSectionRect.bottom, windowHeight) - Math.max(imageSectionRect.top, 0));
+            const imagePercentage = imageVisibleHeight / windowHeight;
+            
+            if (imagePercentage <= 0.7) {
+                actionButtonContainer.classList.add('visible');
+            } else {
+                actionButtonContainer.classList.remove('visible');
+            }
+        }
+        
+        window.addEventListener('scroll', checkScrollPosition);
+        window.addEventListener('resize', checkScrollPosition);
+        
+        // Initialize
+        showImage(0);
+        checkScrollPosition();
+    </script>
+</body>
+</html>
