@@ -5,7 +5,7 @@
   "main": "index.html",
   "scripts": {
     "dev": "python -m http.server 8000",
-    "build": "copy index.html public\\index.html && echo 'Build completed - static site ready'",
+    "build": "cp index.html public/index.html && echo 'Build completed - static site ready'",
     "start": "python -m http.server 8000"
   },
   "keywords": [
